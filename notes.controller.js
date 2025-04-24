@@ -15,7 +15,9 @@ const addNote = async (title) => {
 
     notes.push({
                    title,
-                   id: Date.now().toString()
+                   id: Date.now().toString(),
+                   is_updating: false
+
                })
 
     await fs.writeFile(notesPath, JSON.stringify(notes))
@@ -46,13 +48,21 @@ const removeNote = async (id) => {
     await printNotes()
 }
 
-const updateNote = async (id, newTitle) => {
+const updateNote = async (id, is_updating, newTitle = '') => {
     const notes = await getNotes()
-    const updatedNotes = notes.map((note) => {
-        return note.id === id ? {...note, title: newTitle} : note
-    })
 
-    await fs.writeFile(notesPath, JSON.stringify(updatedNotes))
+    if (newTitle) {
+        const updatedNotes = notes.map((note) => {
+            return note.id === id ? {...note, title: newTitle, is_updating: is_updating} : note
+        })
+        await fs.writeFile(notesPath, JSON.stringify(updatedNotes))
+    } else {
+        const updatedNotes = notes.map((note) => {
+            return note.id === id ? {...note, is_updating: is_updating} : note
+        })
+        await fs.writeFile(notesPath, JSON.stringify(updatedNotes))
+    }
+
     console.log(chalk.red.bold.inverse('Note was updated'));
 
     await printNotes()

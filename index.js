@@ -31,6 +31,7 @@ app.get('/', async (req, res) => {
 
 app.post('/', async (req, res) => {
     await addNote(req.body.title)
+    res.redirect('/')
     res.render('index', {
         title: 'Express App',
         notes: await getNotes(),
@@ -48,7 +49,11 @@ app.delete('/:id', async (req, res) => {
 })
 
 app.patch('/:id', async (req, res) => {
-    await updateNote(req.params.id, req.body.title)
+    if (req.body.title) {
+        await updateNote(req.params.id, req.body.is_updating, req.body.title)
+    } else {
+        await updateNote(req.params.id, req.body.is_updating)
+    }
     res.render('index', {
         title: 'Express App',
         notes: await getNotes(),
